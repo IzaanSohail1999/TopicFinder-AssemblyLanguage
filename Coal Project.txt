@@ -1,0 +1,406 @@
+TITLE COAL PROJECT(TOPIC FINDER)
+INCLUDE Irvine32.inc
+
+.data
+Count byte 0
+Count1 byte 0
+filename BYTE  'Articles.txt',0
+fileHandle HANDLE ?
+wordsize = 30
+buffSize = 10000
+control byte 0
+buffer BYTE buffSize DUP(?)
+temp Byte wordsize Dup(?)
+temp1 BYTE wordsize Dup(?)
+slash Byte ' ',0
+slash1 Byte '-',0
+Dot Byte '.',0
+Greatest Byte 0
+Frequency Byte 10 dup(0)
+Politics Byte "government-","political-","politically-","vote-","ministry-","constitution-","president-","assembly-","province-","national-","minister-","criticism-","law-","democracy-","democrats-","news-",0
+Sports BYTE "cricket-","football-","basketball-","goal-","baseball-","volleyball-","squash-","ball-","dive-","catch-","score-","win-","loose-","run-","field-","hockey-","throw-","athlete-","bowling-","bowler-","championship-","looser-","winner-","swimming-","teammate-","wrestling-","tennis-",0
+Music BYTE "music-"  , "play-" , "pop-" , "classical-" , "jaz-","instruments-","guitars-","violen-" ,"rock-","drum-","piano-","lullabies-","opera-" , "songs-" , "song-" , "dance-" , "listening-" , "listen-" , "compose-" , "composing-", "composed-" , "rhythms-" , "rhythmic-", "mood-",0
+Health BYTE "disease-" , "cancer-" , "tumor-" , "body-" , "heart-","blood-","illness-" , "sickness-","harmful-","healthiness-" ,"wellness-" , "hygiene-" , "welfare-" , "active-" , "bacteria-" , "skin-" , "doctor-", "cough-"  , "prevent-" , "immunity-" , "immune-" , "virus-"  , "antibiotic-" , "medicines-","mental-","physical-", "depression-", "suicide-" , "anxiety-" , "weight-" , "fitness-" , "warmup-", "exercise-" , "exercises-" , "focus-" , "psychological-",0
+Educational BYTE "researches-" , "education-" , "sciences-" , "facts-" , "technological-" , "knowledge-" , "academic-" , "technology-" , "science-" , "innovative-" , "Institution-" , "discovery-" ,"university-" , "institute-" , "diploma-","technical-" , "scientists-" , "literacy-" , "students-" ,  "scientific-",0
+Cultural BYTE "culture-" , "folklore-" , "cultural-" , "anthropology-" , "festival-" , "mythology-" , "art-" , "concept-", "ritual-" , "ethic-" ,"ethics-" , "standards-" , "values-" , "custom-", "lifestyle-" , "principles-" , "inheritance-" , "tradition-" , "civilization-" , "philosophy-" , "generation-",0
+Astronomical BYTE "stars-" , "moon-" , "universe-" , "solar-" , "system-" , "astronauts-" , "radiation-" , "earth-","gas-","black-","hole-","big-","bang-","theory-","celestial-","comet-","cosmos-","planets-","planet-","eclipse-","gravity-","laws-","lunar-","nasa-","space-","astronomy-","telescope-","zenith-",0
+Tourism BYTE "journey-" , "amusement-" , "trip-" , "expedition-" , "flight-" , "outing-" , "tour-" , "cruise-" , "sail-" , "voyage-" , "drive-" , "pilgrimage-" , "hike-" , "navigate-" , "cab-" , "visit-" , "luggage-" , "hotel-" , "accommodation-" , "package-" , "restaurant-" , "attraction-" , "tourist-" , "takeoff-" , "depart-" , "arrive-" , "theme-" , "park-" , "site-" , "museums-",0
+Fashion BYTE "shopping-" , "cool-" , "trend-" , "shows-" , "fashion-" , "style-" , "looks-" , "casual-" , "glamorous-" , "inspired-" , "clothing-" , "vogue-" , "designer-" , "footwear-" , "brand-" , "dresses-" , "boutiques-" , "outfits-" , "fashionable-" , "fancy-" , "elegant-" , "glamorous-" , "costume-" , "model-" , "trends-" , "costumes-" , "creative-" , "fashion designer-" , "fashion-" ,  "show-" , "wardrobe-",0
+Religion BYTE "Religions-"  ,"religion-" ,"faith-" , "belief-" , "angels-" , "angel-" , "devil-" ,"God-" , "messenger-" , "deity-" , "meditation-" , "worship-" , "creation-" , "symbol-" , "religious-"  ,"heaven-" ,"hell-" ,"moral-" ,"mosque-" ,"divinity-" ,"satan-" ,"worship-" , "spirit-" , "demonic-" ,"atheist-" , "virtue-", "christian-", "traditions-" ,"methodist-", "Holy-" , 0
+Topic1 Byte "Politics",0
+Topic2 Byte "Sports",0
+Topic3 Byte "Music",0
+Topic4 Byte "Health",0
+Topic5 Byte "Educational",0
+Topic6 Byte "Cultural",0
+Topic7 Byte "Astronomical",0
+Topic8 Byte "Tourism",0
+Topic9 Byte "Fashion",0
+Topic10 Byte "Religion",0
+mystr4 BYTE "Equal",0
+mystr5 BYTE "Source smaller",0
+mystr6 BYTE "Source larger",0
+mystr3 BYTE "Not Equal",0
+term Byte "Error",0
+
+.code
+;;********************************StartMatching**********************************;;
+startchecking proc
+pushad
+push offset frequency[0]
+push offset Politics ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Politics ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp ,16
+
+push offset frequency[1]
+push offset Sports ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Sports ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp ,16
+
+push offset frequency[2]
+push offset Music ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Music ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+push offset frequency[3]
+push offset Health ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Health ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp ,16
+
+
+push offset frequency[4]
+push offset Educational  ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Educational ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+push offset frequency[5]
+push offset Cultural ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Cultural ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+push offset frequency[6]
+push offset Astronomical ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Astronomical ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+push offset frequency[7]
+push offset Tourism ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Tourism ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+
+push offset frequency[8]
+push offset Fashion ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Fashion ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+
+push offset frequency[9]
+push offset Religion ;+16  this contains the array
+push offset temp ; +12 this contains a word from file
+push lengthof Religion ; +8 this contains the lengthof array politics
+call MatchAndCount
+add esp,16
+popad
+ret
+startchecking endp
+
+;;*******************************STARTMATCHING ENDS HERE**********************;;
+
+;;***CLEAR PROC******;;
+clear proc
+push ebp
+mov ebp ,esp
+pushad
+mov eax, 0
+mov ecx, 0
+mov ebx , 0
+mov ecx ,30
+mov edi, [ebp+8] ;; offset of address temp or temp1
+rep stosb
+
+mov ebx , 0
+mov count ,bl
+popad
+pop ebp
+ret 4
+clear endp
+
+;;***************CLEAR END*******************;;
+
+
+
+;;***CLEAR1 PROC******;;
+clear1 proc
+push ebp
+mov ebp ,esp
+pushad
+mov eax, 0
+mov ecx, 0
+mov ebx , 0
+mov ecx , 0
+mov ecx ,30
+mov edi, [ebp+8] ;; offset of address temp or temp1
+rep stosb
+mov ebx , 0
+mov count , bl
+popad
+pop ebp
+ret 4
+clear1 endp
+
+;;***************CLEAR1 END*************************************;;
+
+;;***************************ArrayCount PROC******************************************;;
+ArrayCount proc
+push ebp
+mov ebp ,esp
+pushad
+mov edi , [ebp+8] ;offset freq array
+mov esi , 0
+mov ebx , 0
+mov ecx , 10
+mov eax , 0
+mov greatest ,al
+l1:
+mov al , 0
+mov al ,[edi]
+cmp al , greatest
+JA found
+jmp continue
+found:
+mov greatest , al
+mov esi,ebx
+continue:
+add edi , 1
+inc ebx
+loop l1
+cmp esi , 0
+JNE c1
+mov edx , offset topic1
+call writestring
+jmp done
+c1:
+cmp esi , 1
+JNE c2
+mov edx , offset topic2
+call writestring
+jmp done
+c2:
+cmp esi , 2
+JNE c3
+mov edx , offset topic3
+call writestring
+jmp done
+c3:
+cmp esi , 3
+JNE c4
+mov edx , offset topic4
+call writestring
+jmp done
+c4:
+cmp esi , 4
+JNE c5
+mov edx , offset topic5
+call writestring
+jmp done
+c5:
+cmp esi , 5
+JNE c6
+mov edx , offset topic6
+call writestring
+jmp done
+c6:
+cmp esi , 6
+JNE c7
+mov edx , offset topic7
+call writestring
+c7:
+cmp esi , 7
+JNE c8
+mov edx , offset topic8
+call writestring
+jmp done
+c8:
+cmp esi , 8
+JNE c9
+mov edx , offset topic9
+call writestring
+jmp done
+c9:
+cmp esi ,9
+JNE done
+mov edx , offset topic10
+call writestring
+done:
+mov al , 0
+mov greatest ,al
+call crlf
+
+popad
+pop ebp
+ret 4
+ArrayCount endp
+
+;;***************ArrayCount END*******************;;
+
+;;**************STRING COMPARE***************;;
+StringCompare proc
+push ebp
+mov ebp ,esp
+pushad
+mov esi,[ebp+8] ;temp1
+mov edi, [ebp+12]  ;temp
+mov ecx,[ebp+16];
+mov ebx , 0
+mov ebx , [ebp+20]
+cld
+repe cmpsb
+je equal
+jne quit
+equal:
+mov eax , 0
+mov eax ,1
+add BYTE ptr [ebx] , al
+inc control
+jmp done
+quit:
+done:
+popad
+pop ebp
+ret 16
+StringCompare endp
+;;**************************************************;;
+
+
+;;************************MATCH AND COUNT**********;;
+MatchAndCount Proc
+push ebp
+mov ebp ,esp
+pushad
+mov esi , [ebp+16] ; offset of politics
+mov edi , offset temp1   ; offset to separate and store one word from politics
+mov ecx ,[ebp+8] ; this contains length of poltics array
+mov eax  , 0
+mov al , slash1 ;slash1='-'
+mov ebx , 0
+mov ebx ,[ebp+20]
+l2:
+mov al ,slash1
+cmp [esi] ,al
+JE Areeb
+JNE continue
+Areeb:
+mov edi,Offset temp1
+inc esi
+push ebx ;push index as argument to compare func
+push Lengthof temp1 ;+16 ;
+push offset temp   ;+12 word from file
+push offset temp1  ;+8 array word to find
+mov edx,offset temp1
+call stringcompare
+push offset temp1
+call clear1
+mov al,0
+mov count1,al
+jmp outside1
+continue:
+inc count1
+movsb
+outside1:
+loop l2
+point:
+popad
+pop ebp
+ret
+MatchAndCount endp
+;;***************************************************************************;;
+
+;;**************************ReadYourFile starts here*********************************;;
+ReadYourFile PROC
+push ebp
+mov ebp,esp
+pushad
+mov  edx,OFFSET filename  
+call OpenInputFile  
+mov  filehandle, EAX
+
+mov  eax, fileHandle
+mov  edx, OFFSET buffer
+mov  ecx, BUfFSIZE  
+call ReadFromFile
+mov edx,Offset buffer
+call WriteString
+call crlf
+popad
+pop ebp
+ret
+ReadYourFile ENDP
+;;******************************ReadYourFile Ends here****************************;;
+
+
+;;;******************************MAIN STARTS HERE****************************;;
+main PROC
+call ReadYourFile
+mov ecx,lengthof buffer
+mov esi,Offset buffer
+mov edi,Offset temp
+mov ebx, 0
+mov eax,0
+
+L1:
+cmp buffer[ebx],' '
+JNE here
+JE StartMatching
+here:
+cmp buffer[ebx] , '?'
+JNE checked
+JE StartMatching
+checked:
+cmp buffer[ebx],'.'
+JNE checkcoma
+JE StartMatching
+checkcoma:
+cmp buffer[ebx] , ','
+JE startMatching
+JNE continue
+StartMatching:
+mov edi,Offset temp
+inc esi
+call startchecking
+push offset temp
+call clear
+push offset Frequency
+call ArrayCount
+mov al,0
+mov count,al
+inc ebx
+jmp outside
+continue:
+inc count
+inc ebx
+movsb
+outside:
+Loop L1
+push offset Frequency
+call ArrayCount
+exit
+main ENDP
+END main 
